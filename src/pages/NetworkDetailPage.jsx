@@ -90,10 +90,14 @@ function NetworkDetailPage() {
   return (
     <div className="network-detail-page">
       <header className="header">
-        <button className="back-btn" onClick={() => navigate(`/${userId}`)}>
-          ← Back
-        </button>
-        <h1>{network.title}</h1>
+        <div className="header-content">
+          <div className="header-nav">
+            <button className="back-btn" onClick={() => navigate(`/${userId}`)}>
+              ← Back
+            </button>
+          </div>
+          <h1>{network.title}</h1>
+        </div>
       </header>
 
       <div className="network-content">

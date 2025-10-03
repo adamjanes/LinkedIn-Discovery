@@ -50,10 +50,14 @@ function SettingsPage() {
   return (
     <div className="settings-page">
       <header className="header">
-        <button className="back-btn" onClick={() => navigate(`/${userId}`)}>
-          ← Back
-        </button>
-        <h1>Settings</h1>
+        <div className="header-content">
+          <div className="header-nav">
+            <button className="back-btn" onClick={() => navigate(`/${userId}`)}>
+              ← Back
+            </button>
+          </div>
+          <h1>Settings</h1>
+        </div>
       </header>
 
       <div className="settings-content">

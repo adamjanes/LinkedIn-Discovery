@@ -1,15 +1,13 @@
 .network-creation-page {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem;
+  width: 100%;
+  min-height: 100vh;
+  background: #f8fafc;
 }
 
 .creation-content {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 2rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .creation-card h2 {
@@ -23,6 +21,7 @@
   margin: 0 0 2rem 0;
   color: #64748b;
   line-height: 1.6;
+  font-size: 1rem;
 }
 
 .creation-form {
@@ -34,14 +33,11 @@
   min-height: 120px;
   font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
   font-size: 0.875rem;
+  line-height: 1.5;
 }
 
 @media (max-width: 768px) {
-  .network-creation-page {
-    padding: 1rem;
-  }
-
   .creation-content {
-    padding: 1.5rem;
+    padding: 1rem;
   }
 }

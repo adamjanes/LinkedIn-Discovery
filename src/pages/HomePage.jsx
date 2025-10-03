@@ -53,8 +53,10 @@ function HomePage() {
   return (
     <div className="homepage">
       <header className="header">
-        <h1>LinkedIn Network Explorer</h1>
-        <p>Discover and expand your professional network</p>
+        <div className="header-content">
+          <h1>LinkedIn Network Explorer</h1>
+          <p>Discover and expand your professional network</p>
+        </div>
       </header>
 
       <div className="networks-section">

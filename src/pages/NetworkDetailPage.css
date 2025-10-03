@@ -1,29 +1,28 @@
 .network-detail-page {
+  width: 100%;
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+.network-content {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
 }
 
-.network-content {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 1rem;
-  padding: 2rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
 .network-stats {
   margin-bottom: 2rem;
   padding: 1rem;
-  background: #f8fafc;
+  background: #dbeafe;
   border-radius: 0.5rem;
-  border-left: 4px solid #3b82f6;
+  border: 1px solid #bfdbfe;
 }
 
 .network-stats p {
   margin: 0;
-  color: #64748b;
-  font-weight: 500;
+  color: #1e40af;
+  font-weight: 600;
+  font-size: 1rem;
 }
 
 .profiles-section h2 {
@@ -58,23 +57,25 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  background: white;
-  border: 2px solid #e2e8f0;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 0.75rem;
   padding: 1.5rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .profile-card:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: #3b82f6;
 }
 
 .profile-card.selected {
   border-color: #3b82f6;
-  background: #f8fafc;
+  background: #f0f9ff;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
 }
 
 .profile-checkbox {
@@ -85,6 +86,7 @@
   width: 1.25rem;
   height: 1.25rem;
   cursor: pointer;
+  accent-color: #3b82f6;
 }
 
 .profile-avatar {
@@ -98,19 +100,21 @@
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
+  border: 1px solid #e2e8f0;
 }
 
 .avatar-placeholder {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #3b82f6;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-weight: 600;
   font-size: 1.25rem;
+  border: 1px solid #e2e8f0;
 }
 
 .profile-info {
@@ -130,6 +134,7 @@
   color: #64748b;
   font-size: 0.875rem;
   line-height: 1.4;
+  font-weight: 500;
 }
 
 .profile-link {
@@ -137,9 +142,11 @@
   text-decoration: none;
   font-size: 0.875rem;
   font-weight: 500;
+  transition: color 0.2s ease;
 }
 
 .profile-link:hover {
+  color: #2563eb;
   text-decoration: underline;
 }
 
@@ -154,10 +161,17 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0.5rem;
-  background: #f1f5f9;
+  padding: 0.75rem;
+  background: #f8fafc;
   border-radius: 0.5rem;
+  border: 1px solid #e2e8f0;
   min-width: 80px;
+  transition: all 0.2s ease;
+}
+
+.stat:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
 }
 
 .stat-label {
@@ -165,6 +179,8 @@
   color: #64748b;
   font-weight: 500;
   margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .stat-value {
@@ -174,31 +190,36 @@
 }
 
 @media (max-width: 768px) {
-  .network-detail-page {
-    padding: 1rem;
-  }
-
   .network-content {
-    padding: 1.5rem;
+    padding: 1rem;
   }
 
   .profiles-header {
     flex-direction: column;
     align-items: stretch;
+    gap: 1rem;
   }
 
   .profile-actions {
     justify-content: center;
+    gap: 0.75rem;
   }
 
   .profile-card {
     flex-direction: column;
     text-align: center;
     gap: 1rem;
+    padding: 1rem;
   }
 
   .profile-stats {
     flex-direction: row;
     justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .stat {
+    min-width: 70px;
+    padding: 0.5rem;
   }
 }

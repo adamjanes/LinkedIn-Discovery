@@ -20,6 +20,7 @@ function NetworkCreationPage() {
     try {
       const userData = await api.getUser(userId)
       setUser(userData)
+      console.log('data',userData)
       if (!userData.apify_api_key) {
         navigate(`/${userId}/settings`)
       }
@@ -73,10 +74,14 @@ function NetworkCreationPage() {
   return (
     <div className="network-creation-page">
       <header className="header">
-        <button className="back-btn" onClick={() => navigate(`/${userId}`)}>
-          ← Back
-        </button>
-        <h1>Create New Network</h1>
+        <div className="header-content">
+          <div className="header-nav">
+            <button className="back-btn" onClick={() => navigate(`/${userId}`)}>
+              ← Back
+            </button>
+          </div>
+          <h1>Create New Network</h1>
+        </div>
       </header>
 
       <div className="creation-content">
