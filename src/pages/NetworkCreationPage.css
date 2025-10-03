@@ -1,0 +1,47 @@
+.network-creation-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.creation-content {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.creation-card h2 {
+  margin: 0 0 1rem 0;
+  color: #1e293b;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.description {
+  margin: 0 0 2rem 0;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+.creation-form {
+  max-width: 600px;
+}
+
+.creation-form textarea {
+  resize: vertical;
+  min-height: 120px;
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 768px) {
+  .network-creation-page {
+    padding: 1rem;
+  }
+
+  .creation-content {
+    padding: 1.5rem;
+  }
+}
