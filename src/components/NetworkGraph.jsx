@@ -59,7 +59,7 @@ function NetworkGraph({ data }) {
       .force("collision", d3.forceCollide().radius(15))
       .force("x", d3.forceX(centerX).strength(0.05))
       .force("y", d3.forceY(centerY).strength(0.05))
-      .alpha(0.3)
+      .alpha(0.5)
       .alphaDecay(0.01)
 
     // Create SVG
