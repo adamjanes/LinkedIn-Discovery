@@ -435,47 +435,11 @@ function NetworkDetailPage() {
                         <div className="mb-3">
                           <div className="grid grid-cols-2 gap-6">
                             {/* Comments To */}
-                            {profile.profile_comments &&
-                              profile.profile_comments.length > 0 && (
-                                <div>
-                                  <div className="text-xs font-medium text-gray-700 mb-2">
-                                    Most Comments To:
-                                  </div>
-                                  <div className="space-y-1">
-                                    {profile.profile_comments.map((comment) => (
-                                      <div
-                                        key={comment.profile_id}
-                                        className="flex items-center gap-1 text-xs"
-                                      >
-                                        <div className="w-3 h-3 rounded-full overflow-hidden flex-shrink-0">
-                                          {comment.picture_url ? (
-                                            <img
-                                              src={comment.picture_url}
-                                              alt={comment.name}
-                                              className="w-full h-full object-cover"
-                                            />
-                                          ) : (
-                                            <div className="w-full h-full bg-blue-600 text-white flex items-center justify-center text-xs font-semibold">
-                                              {getInitials(comment.name)}
-                                            </div>
-                                          )}
-                                        </div>
-                                        <span className="truncate flex-1 text-xs">
-                                          {comment.name} (
-                                          {comment.commentsFromProfile})
-                                        </span>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
-
-                            {/* Comments From */}
                             {profile.profile_commenters &&
                               profile.profile_commenters.length > 0 && (
                                 <div>
                                   <div className="text-xs font-medium text-gray-700 mb-2">
-                                    Most Comments From:
+                                    Most Comments To:
                                   </div>
                                   <div className="space-y-1">
                                     {profile.profile_commenters.map(
@@ -504,6 +468,42 @@ function NetworkDetailPage() {
                                         </div>
                                       )
                                     )}
+                                  </div>
+                                </div>
+                              )}
+
+                            {/* Comments From */}
+                            {profile.profile_comments &&
+                              profile.profile_comments.length > 0 && (
+                                <div>
+                                  <div className="text-xs font-medium text-gray-700 mb-2">
+                                    Most Comments From:
+                                  </div>
+                                  <div className="space-y-1">
+                                    {profile.profile_comments.map((comment) => (
+                                      <div
+                                        key={comment.profile_id}
+                                        className="flex items-center gap-1 text-xs"
+                                      >
+                                        <div className="w-3 h-3 rounded-full overflow-hidden flex-shrink-0">
+                                          {comment.picture_url ? (
+                                            <img
+                                              src={comment.picture_url}
+                                              alt={comment.name}
+                                              className="w-full h-full object-cover"
+                                            />
+                                          ) : (
+                                            <div className="w-full h-full bg-blue-600 text-white flex items-center justify-center text-xs font-semibold">
+                                              {getInitials(comment.name)}
+                                            </div>
+                                          )}
+                                        </div>
+                                        <span className="truncate flex-1 text-xs">
+                                          {comment.name} (
+                                          {comment.commentsFromProfile})
+                                        </span>
+                                      </div>
+                                    ))}
                                   </div>
                                 </div>
                               )}
