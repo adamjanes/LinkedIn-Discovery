@@ -8,12 +8,11 @@ import HomePage from "./pages/HomePage"
 import SettingsPage from "./pages/SettingsPage"
 import NetworkCreationPage from "./pages/NetworkCreationPage"
 import NetworkDetailPage from "./pages/NetworkDetailPage"
-import "./App.css"
 
 function App() {
   return (
     <Router>
-      <div className="app">
+      <div className="min-h-screen bg-background">
         <Routes>
           <Route path="/" element={<Navigate to="/demo-user" replace />} />
           <Route path="/:userId" element={<HomePage />} />

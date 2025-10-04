@@ -74,6 +74,16 @@ class ApiService {
     }
     return response.json()
   }
+
+  async getApifyBalance(userId) {
+    const response = await fetch(
+      `${BASE_URL}/8c7fa7a0-3360-48c7-9f59-92868e60f55d/apify-balance/${userId}`
+    )
+    if (!response.ok) {
+      throw new Error("Failed to fetch Apify balance")
+    }
+    return response.json()
+  }
 }
 
 export default new ApiService()

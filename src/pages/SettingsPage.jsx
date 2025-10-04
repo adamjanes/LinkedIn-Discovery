@@ -1,7 +1,18 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import api from "../services/api"
-import "./SettingsPage.css"
+import ApifyUsageFooter from "../components/ApifyUsageFooter"
+import { Button } from "../components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card"
+import { Input } from "../components/ui/input"
+import { Label } from "../components/ui/label"
+import { ArrowLeft, ExternalLink, CheckCircle, AlertCircle } from "lucide-react"
 
 function SettingsPage() {
   const { userId } = useParams()
@@ -48,62 +59,81 @@ function SettingsPage() {
   }
 
   return (
-    <div className="settings-page">
-      <header className="header">
-        <div className="header-content">
-          <div className="header-nav">
-            <button className="back-btn" onClick={() => navigate(`/${userId}`)}>
-              ← Back
-            </button>
+    <div className="min-h-screen bg-white">
+      <header className="border-b bg-white">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate(`/${userId}`)}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </Button>
+            <h1 className="text-2xl font-semibold">Settings</h1>
           </div>
-          <h1>Settings</h1>
         </div>
       </header>
 
-      <div className="settings-content">
-        <div className="settings-card">
-          <h2>Apify API Key</h2>
-          <p className="description">
-            You need an Apify API key to scrape LinkedIn profiles. Get your key
-            from{" "}
-            <a
-              href="https://apify.com"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              apify.com
-            </a>
-          </p>
+      <main className="container mx-auto px-4 py-8">
+        <Card className="max-w-2xl mx-auto">
+          <CardHeader>
+            <CardTitle>Apify API Key</CardTitle>
+            <CardDescription>
+              You need an Apify API key to scrape LinkedIn profiles. Get your
+              key from{" "}
+              <a
+                href="https://apify.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline inline-flex items-center gap-1"
+              >
+                apify.com
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="apify-key">API Key</Label>
+                <Input
+                  id="apify-key"
+                  type="password"
+                  value={apifyKey}
+                  onChange={(e) => setApifyKey(e.target.value)}
+                  placeholder="Enter your Apify API key"
+                  required
+                />
+              </div>
 
-          <form onSubmit={handleSubmit} className="apify-form">
-            <div className="form-group">
-              <label htmlFor="apify-key">API Key:</label>
-              <input
-                id="apify-key"
-                type="password"
-                value={apifyKey}
-                onChange={(e) => setApifyKey(e.target.value)}
-                placeholder="Enter your Apify API key"
-                required
-              />
-            </div>
+              <Button type="submit" disabled={loading} className="w-full">
+                {loading ? "Saving..." : "Save API Key"}
+              </Button>
+            </form>
 
-            <button type="submit" className="save-btn" disabled={loading}>
-              {loading ? "Saving..." : "Save API Key"}
-            </button>
-          </form>
-
-          {message && (
-            <div
-              className={`message ${
-                message.includes("Error") ? "error" : "success"
-              }`}
-            >
-              {message}
-            </div>
-          )}
-        </div>
-      </div>
+            {message && (
+              <div
+                className={`mt-4 p-4 rounded-md flex items-center gap-2 ${
+                  message.includes("Error")
+                    ? "bg-destructive/10 text-destructive border border-destructive/20"
+                    : "bg-green-50 text-green-700 border border-green-200"
+                }`}
+              >
+                {message.includes("Error") ? (
+                  <AlertCircle className="h-4 w-4" />
+                ) : (
+                  <CheckCircle className="h-4 w-4" />
+                )}
+                {message}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </main>
+      <ApifyUsageFooter />
     </div>
   )
 }

@@ -1,7 +1,19 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import api from "../services/api"
-import "./NetworkCreationPage.css"
+import ApifyUsageFooter from "../components/ApifyUsageFooter"
+import { Button } from "../components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card"
+import { Input } from "../components/ui/input"
+import { Textarea } from "../components/ui/textarea"
+import { Label } from "../components/ui/label"
+import { ArrowLeft, CheckCircle, AlertCircle, Users } from "lucide-react"
 
 function NetworkCreationPage() {
   const { userId } = useParams()
@@ -20,7 +32,7 @@ function NetworkCreationPage() {
     try {
       const userData = await api.getUser(userId)
       setUser(userData)
-      console.log('data',userData)
+      console.log("data", userData)
       if (!userData.apify_api_key) {
         navigate(`/${userId}/settings`)
       }
@@ -65,78 +77,101 @@ function NetworkCreationPage() {
 
   if (!user) {
     return (
-      <div className="network-creation-page">
-        <div className="loading">Loading...</div>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="network-creation-page">
-      <header className="header">
-        <div className="header-content">
-          <div className="header-nav">
-            <button className="back-btn" onClick={() => navigate(`/${userId}`)}>
-              ← Back
-            </button>
+    <div className="min-h-screen bg-white">
+      <header className="border-b bg-white">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate(`/${userId}`)}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </Button>
+            <h1 className="text-2xl font-semibold">Create New Network</h1>
           </div>
-          <h1>Create New Network</h1>
         </div>
       </header>
 
-      <div className="creation-content">
-        <div className="creation-card">
-          <h2>Network Details</h2>
-          <p className="description">
-            Enter a title and LinkedIn profile URLs to seed your network. The
-            system will discover related active creators in the same niche.
-          </p>
+      <main className="container mx-auto px-4 py-8">
+        <Card className="max-w-2xl mx-auto">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              Network Details
+            </CardTitle>
+            <CardDescription>
+              Enter a title and LinkedIn profile URLs to seed your network. The
+              system will discover related active creators in the same niche.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="title">Network Title</Label>
+                <Input
+                  id="title"
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="e.g., AI Influencers, Fractional Leaders"
+                  required
+                />
+              </div>
 
-          <form onSubmit={handleSubmit} className="creation-form">
-            <div className="form-group">
-              <label htmlFor="title">Network Title:</label>
-              <input
-                id="title"
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g., AI Influencers, Fractional Leaders"
-                required
-              />
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="profiles">LinkedIn Profile URLs</Label>
+                <Textarea
+                  id="profiles"
+                  value={profileUrls}
+                  onChange={(e) => setProfileUrls(e.target.value)}
+                  placeholder="https://linkedin.com/in/alice&#10;https://linkedin.com/in/bob&#10;https://linkedin.com/in/charlie"
+                  rows={6}
+                  required
+                />
+                <p className="text-sm text-muted-foreground">
+                  Enter one LinkedIn profile URL per line. The system will
+                  analyze these profiles and discover related active creators.
+                </p>
+              </div>
 
-            <div className="form-group">
-              <label htmlFor="profiles">LinkedIn Profile URLs:</label>
-              <textarea
-                id="profiles"
-                value={profileUrls}
-                onChange={(e) => setProfileUrls(e.target.value)}
-                placeholder="https://linkedin.com/in/alice&#10;https://linkedin.com/in/bob&#10;https://linkedin.com/in/charlie"
-                rows={6}
-                required
-              />
-              <small className="help-text">
-                Enter one LinkedIn profile URL per line. The system will analyze
-                these profiles and discover related active creators.
-              </small>
-            </div>
+              <Button type="submit" disabled={loading} className="w-full">
+                {loading ? "Creating Network..." : "Create Network"}
+              </Button>
+            </form>
 
-            <button type="submit" className="create-btn" disabled={loading}>
-              {loading ? "Creating Network..." : "Create Network"}
-            </button>
-          </form>
-
-          {message && (
-            <div
-              className={`message ${
-                message.includes("Error") ? "error" : "success"
-              }`}
-            >
-              {message}
-            </div>
-          )}
-        </div>
-      </div>
+            {message && (
+              <div
+                className={`mt-6 p-4 rounded-md flex items-center gap-2 ${
+                  message.includes("Error")
+                    ? "bg-destructive/10 text-destructive border border-destructive/20"
+                    : "bg-green-50 text-green-700 border border-green-200"
+                }`}
+              >
+                {message.includes("Error") ? (
+                  <AlertCircle className="h-4 w-4" />
+                ) : (
+                  <CheckCircle className="h-4 w-4" />
+                )}
+                {message}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </main>
+      <ApifyUsageFooter />
     </div>
   )
 }

@@ -1,7 +1,16 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import api from "../services/api"
-import "./HomePage.css"
+import ApifyUsageFooter from "../components/ApifyUsageFooter"
+import { Button } from "../components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card"
+import { RefreshCw, Plus, Settings } from "lucide-react"
 
 function HomePage() {
   const { userId } = useParams()
@@ -34,72 +43,126 @@ function HomePage() {
     }
   }
 
+  const handleReload = () => {
+    loadUserData()
+  }
+
   if (loading) {
     return (
-      <div className="homepage">
-        <div className="loading">Loading...</div>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="homepage">
-        <div className="error">Error: {error}</div>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-red-600">Error</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-600">{error}</p>
+          </CardContent>
+        </Card>
       </div>
     )
   }
 
   return (
-    <div className="homepage">
-      <header className="header">
-        <div className="header-content">
-          <h1>LinkedIn Network Explorer</h1>
-          <p>Discover and expand your professional network</p>
+    <div className="min-h-screen bg-white">
+      <header className="border-b bg-white">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold tracking-tight">
+              LinkedIn Network Explorer
+            </h1>
+            <p className="text-xl text-gray-600 mt-2">
+              Discover and expand your professional network
+            </p>
+          </div>
         </div>
       </header>
 
-      <div className="networks-section">
-        <div className="section-header">
-          <h2>Your Networks</h2>
-          <button className="create-network-btn" onClick={handleCreateNetwork}>
-            Create New Network
-          </button>
+      <main className="container mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-semibold">Your Networks</h2>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={handleReload}
+              disabled={loading}
+              className="flex items-center gap-2"
+            >
+              <RefreshCw
+                className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
+              />
+              {loading ? "Loading..." : "Reload"}
+            </Button>
+            <Button
+              onClick={handleCreateNetwork}
+              className="flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Create New Network
+            </Button>
+          </div>
         </div>
 
         {user?.networks?.length > 0 ? (
-          <div className="networks-list">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {user.networks.map((network) => (
-              <div
+              <Card
                 key={network.id}
-                className="network-card"
+                className="cursor-pointer hover:shadow-md transition-shadow"
                 onClick={() => navigate(`/${userId}/networks/${network.id}`)}
               >
-                <h3>{network.title}</h3>
-                <p className="network-date">
-                  Created: {new Date(network.created_at).toLocaleDateString()}
-                </p>
-              </div>
+                <CardHeader>
+                  <CardTitle className="truncate">{network.title}</CardTitle>
+                  <CardDescription>
+                    Created: {new Date(network.created_at).toLocaleDateString()}
+                  </CardDescription>
+                </CardHeader>
+              </Card>
             ))}
           </div>
         ) : (
-          <div className="empty-state">
-            <p>No networks yet. Create your first network to get started!</p>
-          </div>
+          <Card className="text-center py-12">
+            <CardContent>
+              <p className="text-gray-600 text-lg">
+                No networks yet. Create your first network to get started!
+              </p>
+            </CardContent>
+          </Card>
         )}
-      </div>
 
-      {!user?.apify_api_key && (
-        <div className="setup-notice">
-          <p>⚠️ You need to set up your Apify API key to create networks.</p>
-          <button
-            className="setup-btn"
-            onClick={() => navigate(`/${userId}/settings`)}
-          >
-            Go to Settings
-          </button>
-        </div>
-      )}
+        {!user?.apify_api_key && (
+          <Card className="mt-8 border-amber-200 bg-amber-50">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Settings className="h-5 w-5 text-amber-600" />
+                  <p className="text-amber-800">
+                    You need to set up your Apify API key to create networks.
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => navigate(`/${userId}/settings`)}
+                  className="border-amber-300 text-amber-700 hover:bg-amber-100"
+                >
+                  Go to Settings
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </main>
+      <ApifyUsageFooter />
     </div>
   )
 }
