@@ -54,13 +54,13 @@ function NetworkGraph({ data }) {
           .distance(80)
           .strength(0.3)
       )
-      .force("charge", d3.forceManyBody().strength(-150))
+      .force("charge", d3.forceManyBody().strength(-250))
       .force("center", d3.forceCenter(centerX, centerY))
       .force("collision", d3.forceCollide().radius(15))
       .force("x", d3.forceX(centerX).strength(0.05))
       .force("y", d3.forceY(centerY).strength(0.05))
       .alpha(0.3)
-      .alphaDecay(0.02)
+      .alphaDecay(0.01)
 
     // Create SVG
     const g = svg.attr("width", width).attr("height", height).append("g")
