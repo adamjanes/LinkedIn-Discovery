@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import api from "../services/api"
 import ApifyUsageFooter from "../components/ApifyUsageFooter"
+import NetworkGraph from "../components/NetworkGraph"
 import { Button } from "../components/ui/button"
 import {
   Card,
@@ -26,6 +27,7 @@ function NetworkDetailPage() {
   const { userId, networkId } = useParams()
   const navigate = useNavigate()
   const [network, setNetwork] = useState(null)
+  const [graphData, setGraphData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [expanding, setExpanding] = useState(false)
   const [selectedProfiles, setSelectedProfiles] = useState(new Set())
@@ -37,10 +39,15 @@ function NetworkDetailPage() {
 
   const loadNetworkData = async () => {
     try {
-      const networkData = await api.getNetworkProfiles(userId, networkId)
+      const [networkData, graphDataResponse] = await Promise.all([
+        api.getNetworkProfiles(userId, networkId),
+        api.getNetworkGraph(networkId),
+      ])
       console.log("Network data:", networkData)
       console.log("Seed creators:", networkData.seed_creators)
+      console.log("Graph data:", graphDataResponse)
       setNetwork(networkData)
+      setGraphData(graphDataResponse)
     } catch (err) {
       console.error("Failed to load network data:", err)
     } finally {
@@ -189,6 +196,17 @@ function NetworkDetailPage() {
             {network.seed_creators ? network.seed_creators.length : "No"}
           </p>
         </div>
+
+        {/* Network Graph Visualization */}
+        {graphData && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+              <MessageSquare className="h-6 w-6" />
+              Network Visualization
+            </h2>
+            <NetworkGraph data={graphData} />
+          </div>
+        )}
 
         {network.seed_creators && network.seed_creators.length > 0 && (
           <div className="mb-8">

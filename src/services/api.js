@@ -84,6 +84,16 @@ class ApiService {
     }
     return response.json()
   }
+
+  async getNetworkGraph(networkId) {
+    const response = await fetch(
+      `${BASE_URL}/8c7fa7a0-3360-48c7-9f59-92868e60f55d/networkgraph/${networkId}`
+    )
+    if (!response.ok) {
+      throw new Error("Failed to fetch network graph data")
+    }
+    return response.json()
+  }
 }
 
 export default new ApiService()
