@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from "react"
 import * as d3 from "d3"
 import { Maximize2, Minimize2 } from "lucide-react"
+import { Switch } from "../components/ui/switch"
+import { Label } from "../components/ui/label"
 
 function NetworkGraph({ data }) {
   const svgRef = useRef()
   const containerRef = useRef()
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 })
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [hideLeafNodes, setHideLeafNodes] = useState(false)
 
   // Calculate dimensions based on container
   useEffect(() => {
@@ -30,13 +33,58 @@ function NetworkGraph({ data }) {
     setIsFullscreen(!isFullscreen)
   }
 
+  // Filter nodes and edges based on hideLeafNodes
+  const getFilteredData = () => {
+    if (!data || !data.graph_data) {
+      return { nodes: [], edges: [] }
+    }
+
+    if (!hideLeafNodes) {
+      return { nodes: data.graph_data.nodes, edges: data.graph_data.edges }
+    }
+
+    // Filter nodes: keep seed creators OR nodes with more than 1 connection
+    const filteredNodes = data.graph_data.nodes.filter((node) => {
+      // Always keep seed creators
+      if (node.is_seed) return true
+
+      // Count connections for this specific node using reduce
+      const connectionsCount = data.graph_data.edges.reduce((count, edge) => {
+        return (
+          count +
+          (edge.source.id === node.id ? 1 : 0) +
+          (edge.target.id === node.id ? 1 : 0)
+        )
+      }, 0)
+
+      // Keep nodes with more than 1 connection
+      return connectionsCount > 1
+    })
+
+    // Get IDs of filtered nodes for edge filtering
+    const filteredNodeIds = filteredNodes.map((node) => node.id)
+
+    // Filter edges: keep only edges where both source and target are in filtered nodes
+    const filteredEdges = data.graph_data.edges.filter((edge) => {
+      return (
+        filteredNodeIds.includes(edge.source.id) &&
+        filteredNodeIds.includes(edge.target.id)
+      )
+    })
+
+    return {
+      nodes: filteredNodes,
+      edges: filteredEdges,
+    }
+  }
+
   useEffect(() => {
     if (!data || !data.graph_data) return
 
     const svg = d3.select(svgRef.current)
     svg.selectAll("*").remove() // Clear previous render
 
-    const { nodes, edges } = data.graph_data
+    const { nodes, edges } = getFilteredData()
     const { width, height } = dimensions
 
     // Calculate center for forces
@@ -71,6 +119,30 @@ function NetworkGraph({ data }) {
     })
     svg.call(zoom)
 
+    // Add background cursor styles and click handler
+    svg
+      .style("cursor", "grab")
+      .on("mousedown", function (event) {
+        if (event.target === svg.node()) {
+          svg.style("cursor", "grabbing")
+        }
+      })
+      .on("mouseup", function () {
+        svg.style("cursor", "grab")
+      })
+      .on("mouseleave", function () {
+        svg.style("cursor", "grab")
+      })
+      .on("click", function (event) {
+        // Only reset if clicking on the background (not on nodes)
+        if (event.target === svg.node()) {
+          hoveredNode = null
+          // Reset all nodes and edges to full opacity
+          node.style("opacity", 1)
+          link.style("opacity", 0.8)
+        }
+      })
+
     // Create links
     const link = g
       .append("g")
@@ -78,8 +150,8 @@ function NetworkGraph({ data }) {
       .selectAll("line")
       .data(edges)
       .join("line")
-      .attr("stroke", "#999")
-      .attr("stroke-opacity", 0.6)
+      .attr("stroke", "#999") //
+      .attr("stroke-opacity", 0.8)
       .attr("stroke-width", (d) => Math.sqrt(d.weight) * 2)
 
     // Create nodes
@@ -99,41 +171,38 @@ function NetworkGraph({ data }) {
     const radiusScale = d3
       .scaleSqrt()
       .domain([minFollowers, maxFollowers])
-      .range([4, 20]) // Min 4px, max 20px radius
+      .range([4, 40]) // Min 4px, max 20px radius
 
     // Add circles as background/fallback
     node
       .append("circle")
-      .attr("r", (d) => {
-        if (d.is_seed) return 16 // Seed creators are always larger
-        return radiusScale(d.followers || 0)
-      })
+      .attr("r", (d) => radiusScale(d.followers || 0)) // All nodes use follower-based sizing
       .attr("fill", (d) => (d.is_seed ? "#3b82f6" : "#94a3b8"))
       .attr("stroke", (d) => (d.is_seed ? "#1d4ed8" : "#64748b"))
-      .attr("stroke-width", 2)
+      .attr("stroke-width", (d) => (d.is_seed ? 4 : 2)) // Seed creators have thicker stroke
 
     // Add profile pictures
     node
       .append("image")
       .attr("href", (d) => d.picture_url || "")
       .attr("x", (d) => {
-        const radius = d.is_seed ? 16 : radiusScale(d.followers || 0)
+        const radius = radiusScale(d.followers || 0)
         return -radius
       })
       .attr("y", (d) => {
-        const radius = d.is_seed ? 16 : radiusScale(d.followers || 0)
+        const radius = radiusScale(d.followers || 0)
         return -radius
       })
       .attr("width", (d) => {
-        const radius = d.is_seed ? 16 : radiusScale(d.followers || 0)
+        const radius = radiusScale(d.followers || 0)
         return radius * 2
       })
       .attr("height", (d) => {
-        const radius = d.is_seed ? 16 : radiusScale(d.followers || 0)
+        const radius = radiusScale(d.followers || 0)
         return radius * 2
       })
       .attr("clip-path", (d) => {
-        const radius = d.is_seed ? 16 : radiusScale(d.followers || 0)
+        const radius = radiusScale(d.followers || 0)
         return `circle(${radius}px at ${radius}px ${radius}px)`
       })
       .on("error", function () {
@@ -173,10 +242,15 @@ function NetworkGraph({ data }) {
       node.attr("transform", (d) => `translate(${d.x},${d.y})`)
     })
 
+    // Track drag state
+    let isDragging = false
+    let hoveredNode = null
+
     // Add drag behavior
     const drag = d3
       .drag()
       .on("start", (event, d) => {
+        isDragging = true
         if (!event.active) simulation.alphaTarget(0.3).restart()
         d.fx = d.x
         d.fy = d.y
@@ -186,6 +260,7 @@ function NetworkGraph({ data }) {
         d.fy = event.y
       })
       .on("end", (event, d) => {
+        isDragging = false
         if (!event.active) simulation.alphaTarget(0)
         d.fx = null
         d.fy = null
@@ -193,11 +268,61 @@ function NetworkGraph({ data }) {
 
     node.call(drag)
 
+    // Add cursor styles for nodes
+    node
+      .style("cursor", "pointer")
+      .on("mouseenter", function () {
+        d3.select(this).style("cursor", "pointer")
+      })
+      .on("mouseleave", function () {
+        d3.select(this).style("cursor", "pointer")
+      })
+
+    // Add click effects for edge transparency
+    node.on("click", function (event, d) {
+      event.stopPropagation() // Prevent event bubbling
+
+      // If clicking the same node, reset all
+      if (hoveredNode && hoveredNode.id === d.id) {
+        hoveredNode = null
+        // Reset all nodes and edges to full opacity
+        node.style("opacity", 1)
+        link.style("opacity", 0.8)
+        return
+      }
+
+      hoveredNode = d
+
+      // Get connected node IDs
+      const connectedNodeIds = new Set()
+      edges.forEach((edge) => {
+        if (edge.source.id === d.id || edge.source === d.id) {
+          connectedNodeIds.add(edge.target.id || edge.target)
+        }
+        if (edge.target.id === d.id || edge.target === d.id) {
+          connectedNodeIds.add(edge.source.id || edge.source)
+        }
+      })
+
+      // Make non-connected nodes more transparent
+      node.style("opacity", (nodeData) => {
+        const nodeId = nodeData.id
+        return connectedNodeIds.has(nodeId) || nodeId === d.id ? 1 : 0.2
+      })
+
+      // Make non-connected edges more transparent
+      link.style("opacity", (edgeData) => {
+        const sourceId = edgeData.source.id || edgeData.source
+        const targetId = edgeData.target.id || edgeData.target
+        return sourceId === d.id || targetId === d.id ? 1 : 0.1
+      })
+    })
+
     // Cleanup function
     return () => {
       simulation.stop()
     }
-  }, [data, dimensions])
+  }, [data, dimensions, hideLeafNodes])
 
   // Helper function to format numbers
   const formatNumber = (num) => {
@@ -218,6 +343,8 @@ function NetworkGraph({ data }) {
     )
   }
 
+  const filteredData = getFilteredData()
+
   return (
     <div
       className={`w-full ${
@@ -229,7 +356,7 @@ function NetworkGraph({ data }) {
         <h3 className="text-lg font-semibold">Network Visualization</h3>
         <div className="flex items-center gap-4">
           <div className="text-sm text-gray-600">
-            {data.graph_data.nodes.length} nodes, {data.graph_data.edges.length}{" "}
+            {filteredData.nodes.length} nodes, {filteredData.edges.length}{" "}
             connections
           </div>
           <button
@@ -245,6 +372,19 @@ function NetworkGraph({ data }) {
           </button>
         </div>
       </div>
+
+      {/* Hide Leaf Nodes Toggle */}
+      <div className="mb-4 flex items-center space-x-2">
+        <Switch
+          id="hide-leaf-nodes"
+          checked={hideLeafNodes}
+          onCheckedChange={setHideLeafNodes}
+        />
+        <Label htmlFor="hide-leaf-nodes" className="text-sm cursor-pointer">
+          Hide Leaf Nodes
+        </Label>
+      </div>
+
       <div className="border rounded-lg overflow-hidden bg-white">
         <svg
           ref={svgRef}

@@ -60,34 +60,44 @@ function NetworkDetailPage() {
     if (newSelected.has(profileId)) {
       newSelected.delete(profileId)
     } else {
+      // Check if we're at the limit of 10 profiles
+      if (newSelected.size >= 10) {
+        setMessage("Error: You can only select up to 10 profiles at once")
+        return
+      }
       newSelected.add(profileId)
     }
     setSelectedProfiles(newSelected)
+    setMessage("") // Clear any previous error messages
   }
 
   const handleExpandSelected = async () => {
-    if (selectedProfiles.size === 0) {
-      setMessage("Please select at least one profile to expand")
-      return
-    }
+    if (selectedProfiles.size === 0) return
+
+    setExpanding(true)
+    setMessage("")
 
     try {
-      setExpanding(true)
-      setMessage("")
-      const result = await api.expandNetwork(
-        userId,
-        networkId,
-        Array.from(selectedProfiles)
-      )
-      setMessage(result.message)
+      const profileIds = Array.from(selectedProfiles)
+      const result = await api.expandNetwork(userId, networkId, profileIds)
+      console.log("Expand result:", result)
+      setMessage("Network expanded successfully!")
       setSelectedProfiles(new Set())
+      // Reload data to show the expanded network
+      await loadNetworkData()
     } catch (err) {
-      setMessage(`Error: ${err.message}`)
+      console.error("Failed to expand network:", err)
+      setMessage("Error: Failed to expand network")
     } finally {
       setExpanding(false)
     }
   }
 
+  const handleReload = () => {
+    loadNetworkData()
+  }
+
+  // Helper function to get initials
   const getInitials = (name) => {
     if (!name) return "?"
     const names = name.trim().split(" ")
@@ -99,6 +109,7 @@ function NetworkDetailPage() {
     ).toUpperCase()
   }
 
+  // Helper function to format numbers
   const formatNumber = (num) => {
     if (num >= 1000000) {
       return (num / 1000000).toFixed(1).replace(/\.0$/, "") + "M"
@@ -109,92 +120,81 @@ function NetworkDetailPage() {
     return num.toString()
   }
 
-  const handleSelectAll = () => {
-    if (selectedProfiles.size === network.profiles.length) {
-      setSelectedProfiles(new Set())
-    } else {
-      setSelectedProfiles(new Set(network.profiles.map((p) => p.profile_id)))
-    }
-  }
-
-  const handleReload = () => {
-    loadNetworkData()
-  }
-
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading network...</p>
+      <div className="min-h-screen bg-white">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center h-96">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          </div>
         </div>
+        <ApifyUsageFooter />
       </div>
     )
   }
 
   if (!network) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-destructive">
-              Network Not Found
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">
-              The requested network could not be found.
-            </p>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-white">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center h-96">
+            <div className="text-center">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+                Network Not Found
+              </h2>
+              <p className="text-gray-600 mb-4">
+                The network you're looking for doesn't exist.
+              </p>
+              <Button onClick={() => navigate(`/${userId}`)}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Networks
+              </Button>
+            </div>
+          </div>
+        </div>
+        <ApifyUsageFooter />
       </div>
     )
   }
 
   return (
     <div className="min-h-screen bg-white">
-      <header className="border-b bg-white">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate(`/${userId}`)}
-                className="flex items-center gap-2"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Back
-              </Button>
-              <h1 className="text-2xl font-semibold">{network.title}</h1>
-            </div>
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-4 mb-4">
+            <Button
+              variant="outline"
+              onClick={() => navigate(`/${userId}`)}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Networks
+            </Button>
             <Button
               variant="outline"
               onClick={handleReload}
-              disabled={loading}
               className="flex items-center gap-2"
             >
-              <RefreshCw
-                className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
-              />
-              {loading ? "Loading..." : "Reload"}
+              <RefreshCw className="h-4 w-4" />
+              Reload
             </Button>
           </div>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <div className="flex items-center gap-2 mb-2">
-            <Users className="h-5 w-5 text-blue-600" />
-            <span className="font-semibold text-blue-800">
-              {network.profiles.length} profiles discovered
-            </span>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            {network.title}
+          </h1>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Users className="h-5 w-5 text-blue-600" />
+              <span className="font-semibold text-blue-800">
+                {network.profiles.length} profiles discovered
+              </span>
+            </div>
+            <p className="text-sm text-blue-700">
+              Seed creators added:{" "}
+              {network.seed_creators ? network.seed_creators.length : "No"}
+            </p>
           </div>
-          <p className="text-sm text-blue-700">
-            Seed creators available:{" "}
-            {network.seed_creators ? network.seed_creators.length : "No"}
-          </p>
         </div>
 
         {/* Network Graph Visualization */}
@@ -327,30 +327,31 @@ function NetworkDetailPage() {
                       </div>
                     ) : null}
 
+                    <div className="flex gap-2 w-full mt-auto">
+                      <div className="flex-1 bg-blue-50 rounded-lg p-2 text-center">
+                        <div className="text-lg font-bold text-blue-600">
+                          {creator.CommentsMade || 0}
+                        </div>
+                        <div className="text-xs text-blue-600">Made</div>
+                      </div>
+                      <div className="flex-1 bg-green-50 rounded-lg p-2 text-center">
+                        <div className="text-lg font-bold text-green-600">
+                          {creator.CommentsReceived || 0}
+                        </div>
+                        <div className="text-xs text-green-600">Received</div>
+                      </div>
+                    </div>
+
                     <a
                       href={creator.linkedin_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs text-blue-600 hover:underline flex items-center gap-1"
+                      className="text-sm text-blue-600 hover:underline flex items-center gap-1"
+                      onClick={(e) => e.stopPropagation()}
                     >
                       <ExternalLink className="h-3 w-3" />
                       View Profile
                     </a>
-
-                    <div className="flex gap-2 w-full mt-auto">
-                      <div className="flex-1 text-center p-2 bg-gray-100 rounded">
-                        <div className="text-xs text-gray-600">Made</div>
-                        <div className="font-semibold text-sm">
-                          {creator.CommentsMade}
-                        </div>
-                      </div>
-                      <div className="flex-1 text-center p-2 bg-gray-100 rounded">
-                        <div className="text-xs text-gray-600">Received</div>
-                        <div className="font-semibold text-sm">
-                          {creator.CommentsReceived}
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 </Card>
               ))}
@@ -365,11 +366,6 @@ function NetworkDetailPage() {
               Network Profiles
             </h2>
             <div className="flex gap-2">
-              <Button variant="outline" onClick={handleSelectAll}>
-                {selectedProfiles.size === network.profiles.length
-                  ? "Deselect All"
-                  : "Select All"}
-              </Button>
               <Button
                 onClick={handleExpandSelected}
                 disabled={expanding || selectedProfiles.size === 0}
@@ -399,8 +395,8 @@ function NetworkDetailPage() {
             </div>
           )}
 
-          <div className="space-y-4">
-            {network.profiles.map((profile, index) => (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {network.profiles.map((profile) => (
               <Card
                 key={profile.profile_id}
                 className={`cursor-pointer transition-all hover:shadow-md ${
@@ -433,7 +429,7 @@ function NetworkDetailPage() {
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-lg truncate">
+                      <h3 className="font-semibold text-lg text-gray-900 truncate">
                         {profile.name}
                       </h3>
                       <p className="text-sm text-gray-600 line-clamp-2 mb-2">
@@ -453,11 +449,47 @@ function NetworkDetailPage() {
                         <div className="mb-3">
                           <div className="grid grid-cols-2 gap-6">
                             {/* Comments To */}
+                            {profile.profile_comments &&
+                              profile.profile_comments.length > 0 && (
+                                <div>
+                                  <div className="text-xs font-medium text-gray-700 mb-2">
+                                    Most Comments To:
+                                  </div>
+                                  <div className="space-y-1">
+                                    {profile.profile_comments.map((comment) => (
+                                      <div
+                                        key={comment.profile_id}
+                                        className="flex items-center gap-1 text-xs"
+                                      >
+                                        <div className="w-3 h-3 rounded-full overflow-hidden flex-shrink-0">
+                                          {comment.picture_url ? (
+                                            <img
+                                              src={comment.picture_url}
+                                              alt={comment.name}
+                                              className="w-full h-full object-cover"
+                                            />
+                                          ) : (
+                                            <div className="w-full h-full bg-blue-600 text-white flex items-center justify-center text-xs font-semibold">
+                                              {getInitials(comment.name)}
+                                            </div>
+                                          )}
+                                        </div>
+                                        <span className="truncate flex-1 text-xs">
+                                          {comment.name} (
+                                          {comment.commentsFromProfile})
+                                        </span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                            {/* Comments From */}
                             {profile.profile_commenters &&
                               profile.profile_commenters.length > 0 && (
                                 <div>
                                   <div className="text-xs font-medium text-gray-700 mb-2">
-                                    Most Comments To:
+                                    Most Comments From:
                                   </div>
                                   <div className="space-y-1">
                                     {profile.profile_commenters.map(
@@ -489,45 +521,25 @@ function NetworkDetailPage() {
                                   </div>
                                 </div>
                               )}
-
-                            {/* Comments From */}
-                            {profile.profile_comments &&
-                              profile.profile_comments.length > 0 && (
-                                <div>
-                                  <div className="text-xs font-medium text-gray-700 mb-2">
-                                    Most Comments From:
-                                  </div>
-                                  <div className="space-y-1">
-                                    {profile.profile_comments.map((comment) => (
-                                      <div
-                                        key={comment.profile_id}
-                                        className="flex items-center gap-1 text-xs"
-                                      >
-                                        <div className="w-3 h-3 rounded-full overflow-hidden flex-shrink-0">
-                                          {comment.picture_url ? (
-                                            <img
-                                              src={comment.picture_url}
-                                              alt={comment.name}
-                                              className="w-full h-full object-cover"
-                                            />
-                                          ) : (
-                                            <div className="w-full h-full bg-blue-600 text-white flex items-center justify-center text-xs font-semibold">
-                                              {getInitials(comment.name)}
-                                            </div>
-                                          )}
-                                        </div>
-                                        <span className="truncate flex-1 text-xs">
-                                          {comment.name} (
-                                          {comment.commentsFromProfile})
-                                        </span>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
                           </div>
                         </div>
                       ) : null}
+
+                      {/* Total Comments Summary */}
+                      <div className="flex gap-2 w-full mb-3">
+                        <div className="flex-1 bg-blue-50 rounded-lg p-2 text-center">
+                          <div className="text-lg font-bold text-blue-600">
+                            {profile.commentsMade || 0}
+                          </div>
+                          <div className="text-xs text-blue-600">Made</div>
+                        </div>
+                        <div className="flex-1 bg-green-50 rounded-lg p-2 text-center">
+                          <div className="text-lg font-bold text-green-600">
+                            {profile.commentsReceived || 0}
+                          </div>
+                          <div className="text-xs text-green-600">Received</div>
+                        </div>
+                      </div>
 
                       <a
                         href={profile.linkedin_url}
@@ -540,30 +552,13 @@ function NetworkDetailPage() {
                         View LinkedIn Profile
                       </a>
                     </div>
-
-                    <div className="flex gap-4">
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-blue-600">
-                          {profile.commentsTo}
-                        </div>
-                        <div className="text-xs text-gray-600">Comments To</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-blue-600">
-                          {profile.commentsFrom}
-                        </div>
-                        <div className="text-xs text-gray-600">
-                          Comments From
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
         </div>
-      </main>
+      </div>
       <ApifyUsageFooter />
     </div>
   )
