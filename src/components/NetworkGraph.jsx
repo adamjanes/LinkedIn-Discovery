@@ -171,7 +171,7 @@ function NetworkGraph({ data }) {
     const radiusScale = d3
       .scaleSqrt()
       .domain([minFollowers, maxFollowers])
-      .range([4, 40]) // Min 4px, max 20px radius
+      .range([4, 20]) // Min 4px, max 20px radius
 
     // Add circles as background/fallback
     node
