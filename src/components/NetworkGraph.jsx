@@ -214,7 +214,7 @@ function NetworkGraph({ data }) {
     node
       .filter((d) => d.is_seed)
       .append("text")
-      .attr("dx", 15)
+      .attr("dx", 20)
       .attr("dy", 4)
       .attr("font-size", "12px")
       .attr("font-weight", "bold")
