@@ -8,6 +8,7 @@ import HomePage from "./pages/HomePage"
 import SettingsPage from "./pages/SettingsPage"
 import NetworkCreationPage from "./pages/NetworkCreationPage"
 import NetworkDetailPage from "./pages/NetworkDetailPage"
+import TopNonTechnicalBuildersPage from "./pages/TopNonTechnicalBuildersPage"
 
 function App() {
   return (
@@ -24,6 +25,10 @@ function App() {
           <Route
             path="/:userId/networks/:networkId"
             element={<NetworkDetailPage />}
+          />
+          <Route
+            path="/top-non-technical-builders"
+            element={<TopNonTechnicalBuildersPage />}
           />
         </Routes>
       </div>

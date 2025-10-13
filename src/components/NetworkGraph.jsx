@@ -176,7 +176,7 @@ function NetworkGraph({ data }) {
     // Add circles as background/fallback
     node
       .append("circle")
-      .attr("r", (d) => radiusScale(d.followers || 0)) // All nodes use follower-based sizing
+      .attr("r", (d) => d.is_seed ? 16 : radiusScale(d.followers || 0)) // All nodes use follower-based sizing
       .attr("fill", (d) => (d.is_seed ? "#3b82f6" : "#94a3b8"))
       .attr("stroke", (d) => (d.is_seed ? "#1d4ed8" : "#64748b"))
       .attr("stroke-width", (d) => (d.is_seed ? 4 : 2)) // Seed creators have thicker stroke
@@ -186,23 +186,23 @@ function NetworkGraph({ data }) {
       .append("image")
       .attr("href", (d) => d.picture_url || "")
       .attr("x", (d) => {
-        const radius = radiusScale(d.followers || 0)
+        const radius = d.is_seed ? 16 : radiusScale(d.followers || 0)
         return -radius
       })
       .attr("y", (d) => {
-        const radius = radiusScale(d.followers || 0)
+        const radius = d.is_seed ? 16 : radiusScale(d.followers || 0)
         return -radius
       })
       .attr("width", (d) => {
-        const radius = radiusScale(d.followers || 0)
+        const radius = d.is_seed ? 16 : radiusScale(d.followers || 0)
         return radius * 2
       })
       .attr("height", (d) => {
-        const radius = radiusScale(d.followers || 0)
+        const radius = d.is_seed ? 16 : radiusScale(d.followers || 0)
         return radius * 2
       })
       .attr("clip-path", (d) => {
-        const radius = radiusScale(d.followers || 0)
+        const radius = d.is_seed ? 16 : radiusScale(d.followers || 0)
         return `circle(${radius}px at ${radius}px ${radius}px)`
       })
       .on("error", function () {
