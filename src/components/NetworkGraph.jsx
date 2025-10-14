@@ -3,6 +3,7 @@ import * as d3 from "d3"
 import { Maximize2, Minimize2 } from "lucide-react"
 import { Switch } from "../components/ui/switch"
 import { Label } from "../components/ui/label"
+import { trackEvent } from "@/utils/analytics"
 
 function NetworkGraph({ data }) {
   const svgRef = useRef()
@@ -31,6 +32,12 @@ function NetworkGraph({ data }) {
   // Toggle fullscreen
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen)
+    trackEvent(
+      "click",
+      "network_graph",
+      "fullscreen_toggle",
+      isFullscreen ? 0 : 1
+    )
   }
 
   // Filter nodes and edges based on hideLeafNodes
@@ -176,7 +183,7 @@ function NetworkGraph({ data }) {
     // Add circles as background/fallback
     node
       .append("circle")
-      .attr("r", (d) => d.is_seed ? 16 : radiusScale(d.followers || 0)) // All nodes use follower-based sizing
+      .attr("r", (d) => (d.is_seed ? 16 : radiusScale(d.followers || 0))) // All nodes use follower-based sizing
       .attr("fill", (d) => (d.is_seed ? "#3b82f6" : "#94a3b8"))
       .attr("stroke", (d) => (d.is_seed ? "#1d4ed8" : "#64748b"))
       .attr("stroke-width", (d) => (d.is_seed ? 4 : 2)) // Seed creators have thicker stroke
@@ -378,7 +385,15 @@ function NetworkGraph({ data }) {
         <Switch
           id="hide-leaf-nodes"
           checked={hideLeafNodes}
-          onCheckedChange={setHideLeafNodes}
+          onCheckedChange={(checked) => {
+            setHideLeafNodes(checked)
+            trackEvent(
+              "click",
+              "network_graph",
+              "hide_leaf_nodes_toggle",
+              checked ? 1 : 0
+            )
+          }}
         />
         <Label htmlFor="hide-leaf-nodes" className="text-sm cursor-pointer">
           Hide Leaf Nodes

@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Users, MessageSquare, UserCheck, ExternalLink } from "lucide-react"
 import api from "@/services/api"
 import NetworkGraph from "@/components/NetworkGraph"
+import { trackNetworkPageView, trackEvent } from "@/utils/analytics"
 
 function NetworkPage({
   networkId,
@@ -41,7 +42,9 @@ function NetworkPage({
 
   useEffect(() => {
     loadNetworkData()
-  }, [networkId])
+    // Track page view
+    trackNetworkPageView(title)
+  }, [networkId, title])
 
   const loadNetworkData = async () => {
     try {
@@ -185,6 +188,9 @@ function NetworkPage({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm font-medium mt-1"
+                  onClick={() =>
+                    trackEvent("click", "social_link", "adam_linkedin")
+                  }
                 >
                   <ExternalLink className="h-3 w-3" />
                   Follow on LinkedIn
@@ -222,6 +228,9 @@ function NetworkPage({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm font-medium mt-1"
+                  onClick={() =>
+                    trackEvent("click", "social_link", "jacob_linkedin")
+                  }
                 >
                   <ExternalLink className="h-3 w-3" />
                   Follow on LinkedIn

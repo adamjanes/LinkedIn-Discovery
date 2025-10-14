@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import {
   BrowserRouter as Router,
   Routes,
@@ -10,8 +11,14 @@ import NetworkCreationPage from "./pages/NetworkCreationPage"
 import NetworkDetailPage from "./pages/NetworkDetailPage"
 import TopNonTechnicalBuildersPage from "./pages/TopNonTechnicalBuildersPage"
 import TopTechnicalBuildersPage from "./pages/TopTechnicalBuildersPage"
+import { initGA } from "./utils/analytics"
 
 function App() {
+  useEffect(() => {
+    // Initialize Google Analytics
+    initGA()
+  }, [])
+
   return (
     <Router>
       <div className="min-h-screen bg-background">
