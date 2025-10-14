@@ -652,13 +652,13 @@ function NetworkPage({
                     <div className="flex gap-2 w-full mb-3 mt-auto">
                       <div className="flex-1 bg-blue-50 rounded-lg p-2 text-center">
                         <div className="text-lg font-bold text-blue-600">
-                          {profile.CommentsMade || 0}
+                          {profile.commentsFrom || 0}
                         </div>
                         <div className="text-xs text-blue-600">Made</div>
                       </div>
                       <div className="flex-1 bg-green-50 rounded-lg p-2 text-center">
                         <div className="text-lg font-bold text-green-600">
-                          {profile.CommentsReceived || 0}
+                          {profile.commentsTo || 0}
                         </div>
                         <div className="text-xs text-green-600">Received</div>
                       </div>
