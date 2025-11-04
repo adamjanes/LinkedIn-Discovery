@@ -42,6 +42,7 @@
     "db:query": "node db/query.js",
     "db:schema": "node db/schema.js",
     "db:explore": "node db/explore-schema.js",
-    "db:doc": "node db/explore-schema.js > db/schema-reference.md"
+    "db:doc": "node db/explore-schema.js > db/schema-reference.md",
+    "db:migrate": "node db/migrations/migrate.js"
   }
 }
