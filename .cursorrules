@@ -1,0 +1,19 @@
+# Cursor Rules
+
+## Database Migrations
+
+**IMPORTANT**: Before running any database migration commands (`npm run db:migrate up`, `npm run db:migrate down`, etc.), you MUST:
+
+1. Create the migration file
+2. Show the user what the migration will do
+3. **Wait for explicit user approval** before executing any migration commands
+
+This rule applies to ALL migration operations, including:
+- Creating new tables
+- Altering existing tables
+- Seeding data
+- Rolling back migrations
+- Any other database migration operations
+
+**Never run migrations automatically** - always wait for user confirmation first.
+
