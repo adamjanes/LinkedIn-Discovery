@@ -4,6 +4,7 @@ import { query, testConnection, closePool } from "./connection.js"
 const sqlQuery = process.argv.slice(2).join(" ")
 
 async function runQuery() {
+  console.log("hi")
   if (!sqlQuery) {
     console.log("📝 Interactive SQL Query Tool")
     console.log("=".repeat(60))
@@ -19,6 +20,7 @@ async function runQuery() {
 
   try {
     // Test connection first
+    console.log("Testing")
     const connected = await testConnection()
     if (!connected) {
       console.log("\n💡 Tip: Make sure you have a .env file with:")

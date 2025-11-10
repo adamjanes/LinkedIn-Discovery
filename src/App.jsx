@@ -11,6 +11,7 @@ import NetworkCreationPage from "./pages/NetworkCreationPage"
 import NetworkDetailPage from "./pages/NetworkDetailPage"
 import TopNonTechnicalBuildersPage from "./pages/TopNonTechnicalBuildersPage"
 import TopTechnicalBuildersPage from "./pages/TopTechnicalBuildersPage"
+import LastWeekAIBuildersPage from "./pages/LastWeekAIBuildersPage"
 import { initGA } from "./utils/analytics"
 
 function App() {
@@ -44,6 +45,10 @@ function App() {
           <Route
             path="/top-technical-builders"
             element={<TopTechnicalBuildersPage />}
+          />
+          <Route
+            path="/last-week-ai-builders"
+            element={<LastWeekAIBuildersPage />}
           />
         </Routes>
       </div>

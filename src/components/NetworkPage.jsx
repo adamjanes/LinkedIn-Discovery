@@ -19,6 +19,8 @@ function NetworkPage({
   subtitle,
   showBackButton = false,
   onBackClick,
+  fromDateTime = null,
+  toDateTime = null,
 }) {
   const [network, setNetwork] = useState(null)
   const [graphData, setGraphData] = useState(null)
@@ -44,7 +46,7 @@ function NetworkPage({
     loadNetworkData()
     // Track page view
     trackNetworkPageView(title)
-  }, [networkId, title])
+  }, [networkId, title, fromDateTime, toDateTime])
 
   const loadNetworkData = async () => {
     try {
@@ -56,8 +58,8 @@ function NetworkPage({
 
       // Fetch network and graph data in parallel
       const [networkData, graphDataResponse] = await Promise.all([
-        api.getNetworkProfiles(userId, networkId),
-        api.getNetworkGraph(networkId),
+        api.getNetworkProfiles(userId, networkId, fromDateTime, toDateTime),
+        api.getNetworkGraph(networkId, fromDateTime, toDateTime),
       ])
       setNetwork(networkData)
       setGraphData(graphDataResponse)
