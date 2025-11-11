@@ -47,10 +47,17 @@ class ApiService {
     return response.json()
   }
 
-  async getNetworkProfiles(userId, networkId, fromDateTime = null, toDateTime = null) {
+  async getNetworkProfiles(
+    userId,
+    networkId,
+    fromDateTime = null,
+    toDateTime = null
+  ) {
     let url = `${BASE_URL}/8c7fa7a0-3360-48c7-9f59-92868e60f55d/networks/${userId}/${networkId}`
     if (fromDateTime && toDateTime) {
-      url += `?from=${encodeURIComponent(fromDateTime)}&to=${encodeURIComponent(toDateTime)}`
+      url += `?from=${encodeURIComponent(fromDateTime)}&to=${encodeURIComponent(
+        toDateTime
+      )}`
     }
     const response = await fetch(url)
     if (!response.ok) {
@@ -90,7 +97,9 @@ class ApiService {
   async getNetworkGraph(networkId, fromDateTime = null, toDateTime = null) {
     let url = `${BASE_URL}/8c7fa7a0-3360-48c7-9f59-92868e60f55d/networkgraph/${networkId}`
     if (fromDateTime && toDateTime) {
-      url += `?from=${encodeURIComponent(fromDateTime)}&to=${encodeURIComponent(toDateTime)}`
+      url += `?from=${encodeURIComponent(fromDateTime)}&to=${encodeURIComponent(
+        toDateTime
+      )}`
     }
     const response = await fetch(url)
     if (!response.ok) {

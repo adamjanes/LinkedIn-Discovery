@@ -39,15 +39,15 @@ all_edges AS (
     ON sc.profile_id IN (c."Profiles_id", po."Profiles_id")
   WHERE c."Profiles_id" <> po."Profiles_id"
     AND (
-      -- If datetime parameters are NULL, empty, or the string "null", return all data
-      (NULLIF(NULLIF($2::text, ''), 'null') IS NULL AND NULLIF(NULLIF($3::text, ''), 'null') IS NULL)
+      -- If datetime parameters are NULL, empty, or the string "null" (with possible whitespace), return all data
+      (NULLIF(TRIM(NULLIF($2::text, '')), 'null') IS NULL AND NULLIF(TRIM(NULLIF($3::text, '')), 'null') IS NULL)
       OR
       -- Otherwise, filter by post creation time (postedTime) - includes all comments on posts in the time window
       (
-        NULLIF(NULLIF($2::text, ''), 'null') IS NOT NULL 
-        AND NULLIF(NULLIF($3::text, ''), 'null') IS NOT NULL
-        AND po."postedTime" >= NULLIF(NULLIF($2::text, ''), 'null')::timestamptz 
-        AND po."postedTime" < NULLIF(NULLIF($3::text, ''), 'null')::timestamptz
+        NULLIF(TRIM(NULLIF($2::text, '')), 'null') IS NOT NULL 
+        AND NULLIF(TRIM(NULLIF($3::text, '')), 'null') IS NOT NULL
+        AND po."postedTime" >= NULLIF(TRIM(NULLIF($2::text, '')), 'null')::timestamptz 
+        AND po."postedTime" < NULLIF(TRIM(NULLIF($3::text, '')), 'null')::timestamptz
       )
     )
   GROUP BY seed_id, c."Profiles_id", po."Profiles_id"

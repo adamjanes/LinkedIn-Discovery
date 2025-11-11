@@ -4,8 +4,8 @@ import NetworkPage from "@/components/NetworkPage"
 function LastWeekAIBuildersPage() {
   // Test date range: 2025-10-20T00:00:00Z to 2025-10-21T00:00:00Z
   // Later this will be a full week range
-  const fromDateTime = "2025-10-20T00:00:00Z"
-  const toDateTime = "2025-10-21T00:00:00Z"
+  const fromDateTime = "2025-10-27T00:00:00Z"
+  const toDateTime = "2025-11-03T00:00:00Z"
 
   return (
     <NetworkPage
@@ -19,4 +19,3 @@ function LastWeekAIBuildersPage() {
 }
 
 export default LastWeekAIBuildersPage
-

@@ -39,15 +39,15 @@ all_edges AS (
     ON sc.profile_id IN (c."Profiles_id", po."Profiles_id")
   WHERE c."Profiles_id" <> po."Profiles_id"
     AND (
-      -- If datetime parameters are NULL, empty, or the string "null", return all data
-      (NULLIF(NULLIF($2::text, ''), 'null') IS NULL AND NULLIF(NULLIF($3::text, ''), 'null') IS NULL)
+      -- If datetime parameters are NULL, empty, or the string "null" (with possible whitespace), return all data
+      (NULLIF(TRIM(NULLIF($2::text, '')), 'null') IS NULL AND NULLIF(TRIM(NULLIF($3::text, '')), 'null') IS NULL)
       OR
       -- Otherwise, filter by post creation time (postedTime) - includes all comments on posts in the time window
       (
-        NULLIF(NULLIF($2::text, ''), 'null') IS NOT NULL 
-        AND NULLIF(NULLIF($3::text, ''), 'null') IS NOT NULL
-        AND po."postedTime" >= NULLIF(NULLIF($2::text, ''), 'null')::timestamptz 
-        AND po."postedTime" < NULLIF(NULLIF($3::text, ''), 'null')::timestamptz
+        NULLIF(TRIM(NULLIF($2::text, '')), 'null') IS NOT NULL 
+        AND NULLIF(TRIM(NULLIF($3::text, '')), 'null') IS NOT NULL
+        AND po."postedTime" >= NULLIF(TRIM(NULLIF($2::text, '')), 'null')::timestamptz 
+        AND po."postedTime" < NULLIF(TRIM(NULLIF($3::text, '')), 'null')::timestamptz
       )
     )
   GROUP BY seed_id, c."Profiles_id", po."Profiles_id"
@@ -82,12 +82,16 @@ comments_map AS (
   FROM distinct_edges de
 ),
 
--- ✅ Separate seed↔seed subset
+-- ✅ Separate seed↔seed subset (deduplicated)
 seed_comments_map AS (
-  SELECT *
+  SELECT 
+    commenter_id,
+    target_id,
+    SUM(comment_count) AS comment_count
   FROM comments_map
   WHERE commenter_id IN (SELECT profile_id FROM seed_creators)
     AND target_id   IN (SELECT profile_id FROM seed_creators)
+  GROUP BY commenter_id, target_id
 ),
 
 -- ✅ All profiles appearing in limited interactions
@@ -182,34 +186,66 @@ profile_relationships AS (
 ),
 
 -- ✅ Seed ↔ seed relationships
+seed_comments_directed AS (
+  -- Comments made BY seeds (seed is commenter)
+  SELECT
+    s.profile_id AS seed_id,
+    scm.target_id AS other_profile_id,
+    SUM(scm.comment_count) AS comment_count
+  FROM seed_creators_stats s
+  INNER JOIN seed_comments_map scm ON scm.commenter_id = s.profile_id
+  GROUP BY s.profile_id, scm.target_id
+),
+seed_commenters_directed AS (
+  -- Comments made TO seeds (seed is target)
+  SELECT
+    s.profile_id AS seed_id,
+    scm.commenter_id AS other_profile_id,
+    SUM(scm.comment_count) AS comment_count
+  FROM seed_creators_stats s
+  INNER JOIN seed_comments_map scm ON scm.target_id = s.profile_id
+  GROUP BY s.profile_id, scm.commenter_id
+),
+seed_comments_agg AS (
+  -- Aggregate comments made BY seeds
+  SELECT
+    scd.seed_id,
+    jsonb_agg(
+      jsonb_build_object(
+        'profile_id', scd.other_profile_id,
+        'name', np.name,
+        'picture_url', np.picture_url,
+        'commentsFromSeed', scd.comment_count
+      ) ORDER BY scd.comment_count DESC
+    ) AS seed_comments
+  FROM seed_comments_directed scd
+  INNER JOIN network_profiles np ON np.profile_id = scd.other_profile_id
+  GROUP BY scd.seed_id
+),
+seed_commenters_agg AS (
+  -- Aggregate comments made TO seeds
+  SELECT
+    scrd.seed_id,
+    jsonb_agg(
+      jsonb_build_object(
+        'profile_id', scrd.other_profile_id,
+        'name', np.name,
+        'picture_url', np.picture_url,
+        'commentsToSeed', scrd.comment_count
+      ) ORDER BY scrd.comment_count DESC
+    ) AS seed_commenters
+  FROM seed_commenters_directed scrd
+  INNER JOIN network_profiles np ON np.profile_id = scrd.other_profile_id
+  GROUP BY scrd.seed_id
+),
 seed_relationships AS (
   SELECT
     s.profile_id AS seed_id,
-    jsonb_agg(
-      jsonb_build_object(
-        'profile_id', np.profile_id,
-        'name', np.name,
-        'picture_url', np.picture_url,
-        'commentsFromSeed', scm.comment_count
-      ) ORDER BY scm.comment_count DESC
-    ) FILTER (WHERE scm.commenter_id = s.profile_id) AS seed_comments,
-    jsonb_agg(
-      jsonb_build_object(
-        'profile_id', np.profile_id,
-        'name', np.name,
-        'picture_url', np.picture_url,
-        'commentsToSeed', scm.comment_count
-      ) ORDER BY scm.comment_count DESC
-    ) FILTER (WHERE scm.target_id = s.profile_id) AS seed_commenters
+    COALESCE(sca.seed_comments, '[]'::jsonb) AS seed_comments,
+    COALESCE(scra.seed_commenters, '[]'::jsonb) AS seed_commenters
   FROM seed_creators_stats s
-  LEFT JOIN seed_comments_map scm
-    ON scm.commenter_id = s.profile_id OR scm.target_id = s.profile_id
-  LEFT JOIN network_profiles np
-    ON np.profile_id = CASE 
-                         WHEN scm.commenter_id = s.profile_id THEN scm.target_id
-                         ELSE scm.commenter_id
-                       END
-  GROUP BY s.profile_id
+  LEFT JOIN seed_comments_agg sca ON sca.seed_id = s.profile_id
+  LEFT JOIN seed_commenters_agg scra ON scra.seed_id = s.profile_id
 )
 
 SELECT jsonb_build_object(

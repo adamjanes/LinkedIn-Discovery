@@ -340,133 +340,196 @@ function NetworkPage({
                   </CardHeader>
                   <CardContent className="pt-0 flex flex-col flex-1">
                     {/* Comment Interactions */}
-                    {(creator.seed_comments &&
-                      creator.seed_comments.length > 0) ||
-                    (creator.seed_commenters &&
-                      creator.seed_commenters.length > 0) ? (
-                      <div className="mb-3">
-                        <div className="grid grid-cols-2 gap-4">
-                          {/* Left Column - Most Comments To */}
-                          <div>
-                            {creator.seed_comments &&
-                            creator.seed_comments.length > 0 ? (
-                              <>
-                                <div className="text-xs font-medium text-gray-700 mb-2">
-                                  Most Comments To:
-                                </div>
-                                <div className="space-y-1">
-                                  {creator.seed_comments.map((comment) => (
-                                    <div
-                                      key={comment.profile_id}
-                                      className="flex items-center gap-1 text-xs"
-                                    >
-                                      <div className="relative">
-                                        {comment.picture_url ? (
-                                          <img
-                                            src={comment.picture_url}
-                                            alt={comment.name}
-                                            className="w-4 h-4 rounded-full object-cover"
-                                            onError={(e) => {
-                                              e.target.style.display = "none"
-                                              e.target.nextSibling.style.display =
-                                                "flex"
-                                            }}
-                                          />
-                                        ) : null}
-                                        <div
-                                          className={`w-4 h-4 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-semibold text-xs ${
-                                            comment.picture_url
-                                              ? "hidden"
-                                              : "flex"
-                                          }`}
-                                        >
-                                          {getInitials(comment.name)}
-                                        </div>
-                                      </div>
-                                      <span className="truncate flex-1 text-xs">
-                                        {comment.name} (
-                                        {comment.commentsFromSeed})
-                                      </span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </>
-                            ) : (
-                              <div className="text-xs text-gray-400">
-                                No comments made
-                              </div>
-                            )}
+                    {title === "Last Week AI Builders" ? (
+                      // Simplified view for Last Week AI Builders - only show "Most Comments To"
+                      creator.seed_comments && creator.seed_comments.length > 0 ? (
+                        <div className="mb-3">
+                          <div className="text-xs font-medium text-gray-700 mb-2">
+                            Most Comments To:
                           </div>
-                          {/* Right Column - Most Comments From */}
-                          <div>
-                            {creator.seed_commenters &&
-                            creator.seed_commenters.length > 0 ? (
-                              <>
-                                <div className="text-xs font-medium text-gray-700 mb-2">
-                                  Most Comments From:
+                          <div className="space-y-1">
+                            {creator.seed_comments.map((comment) => (
+                              <div
+                                key={comment.profile_id}
+                                className="flex items-center gap-1 text-xs"
+                              >
+                                <div className="relative">
+                                  {comment.picture_url ? (
+                                    <img
+                                      src={comment.picture_url}
+                                      alt={comment.name}
+                                      className="w-4 h-4 rounded-full object-cover"
+                                      onError={(e) => {
+                                        e.target.style.display = "none"
+                                        e.target.nextSibling.style.display =
+                                          "flex"
+                                      }}
+                                    />
+                                  ) : null}
+                                  <div
+                                    className={`w-4 h-4 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-semibold text-xs ${
+                                      comment.picture_url
+                                        ? "hidden"
+                                        : "flex"
+                                    }`}
+                                  >
+                                    {getInitials(comment.name)}
+                                  </div>
                                 </div>
-                                <div className="space-y-1">
-                                  {creator.seed_commenters.map((commenter) => (
-                                    <div
-                                      key={commenter.profile_id}
-                                      className="flex items-center gap-1 text-xs"
-                                    >
-                                      <div className="relative">
-                                        {commenter.picture_url ? (
-                                          <img
-                                            src={commenter.picture_url}
-                                            alt={commenter.name}
-                                            className="w-4 h-4 rounded-full object-cover"
-                                            onError={(e) => {
-                                              e.target.style.display = "none"
-                                              e.target.nextSibling.style.display =
-                                                "flex"
-                                            }}
-                                          />
-                                        ) : null}
-                                        <div
-                                          className={`w-4 h-4 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-semibold text-xs ${
-                                            commenter.picture_url
-                                              ? "hidden"
-                                              : "flex"
-                                          }`}
-                                        >
-                                          {getInitials(commenter.name)}
-                                        </div>
-                                      </div>
-                                      <span className="truncate flex-1 text-xs">
-                                        {commenter.name} (
-                                        {commenter.commentsToSeed})
-                                      </span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </>
-                            ) : (
-                              <div className="text-xs text-gray-400">
-                                No comments received
+                                <span className="truncate flex-1 text-xs">
+                                  {comment.name} (
+                                  {comment.commentsFromSeed})
+                                </span>
                               </div>
-                            )}
+                            ))}
                           </div>
                         </div>
-                      </div>
-                    ) : null}
+                      ) : null
+                    ) : (
+                      // Original view for other pages
+                      (creator.seed_comments &&
+                        creator.seed_comments.length > 0) ||
+                      (creator.seed_commenters &&
+                        creator.seed_commenters.length > 0) ? (
+                        <div className="mb-3">
+                          <div className="grid grid-cols-2 gap-4">
+                            {/* Left Column - Most Comments To */}
+                            <div>
+                              {creator.seed_comments &&
+                              creator.seed_comments.length > 0 ? (
+                                <>
+                                  <div className="text-xs font-medium text-gray-700 mb-2">
+                                    Most Comments To:
+                                  </div>
+                                  <div className="space-y-1">
+                                    {creator.seed_comments.map((comment) => (
+                                      <div
+                                        key={comment.profile_id}
+                                        className="flex items-center gap-1 text-xs"
+                                      >
+                                        <div className="relative">
+                                          {comment.picture_url ? (
+                                            <img
+                                              src={comment.picture_url}
+                                              alt={comment.name}
+                                              className="w-4 h-4 rounded-full object-cover"
+                                              onError={(e) => {
+                                                e.target.style.display = "none"
+                                                e.target.nextSibling.style.display =
+                                                  "flex"
+                                              }}
+                                            />
+                                          ) : null}
+                                          <div
+                                            className={`w-4 h-4 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-semibold text-xs ${
+                                              comment.picture_url
+                                                ? "hidden"
+                                                : "flex"
+                                            }`}
+                                          >
+                                            {getInitials(comment.name)}
+                                          </div>
+                                        </div>
+                                        <span className="truncate flex-1 text-xs">
+                                          {comment.name} (
+                                          {comment.commentsFromSeed})
+                                        </span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </>
+                              ) : (
+                                <div className="text-xs text-gray-400">
+                                  No comments made
+                                </div>
+                              )}
+                            </div>
+                            {/* Right Column - Most Comments From */}
+                            <div>
+                              {creator.seed_commenters &&
+                              creator.seed_commenters.length > 0 ? (
+                                <>
+                                  <div className="text-xs font-medium text-gray-700 mb-2">
+                                    Most Comments From:
+                                  </div>
+                                  <div className="space-y-1">
+                                    {creator.seed_commenters.map((commenter) => (
+                                      <div
+                                        key={commenter.profile_id}
+                                        className="flex items-center gap-1 text-xs"
+                                      >
+                                        <div className="relative">
+                                          {commenter.picture_url ? (
+                                            <img
+                                              src={commenter.picture_url}
+                                              alt={commenter.name}
+                                              className="w-4 h-4 rounded-full object-cover"
+                                              onError={(e) => {
+                                                e.target.style.display = "none"
+                                                e.target.nextSibling.style.display =
+                                                  "flex"
+                                              }}
+                                            />
+                                          ) : null}
+                                          <div
+                                            className={`w-4 h-4 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-semibold text-xs ${
+                                              commenter.picture_url
+                                                ? "hidden"
+                                                : "flex"
+                                            }`}
+                                          >
+                                            {getInitials(commenter.name)}
+                                          </div>
+                                        </div>
+                                        <span className="truncate flex-1 text-xs">
+                                          {commenter.name} (
+                                          {commenter.commentsToSeed})
+                                        </span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </>
+                              ) : (
+                                <div className="text-xs text-gray-400">
+                                  No comments received
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ) : null
+                    )}
 
                     {/* Total Comments Summary */}
-                    <div className="flex gap-2 w-full mt-auto">
-                      <div className="flex-1 bg-blue-50 rounded-lg p-2 text-center">
-                        <div className="text-lg font-bold text-blue-600">
-                          {creator.CommentsMade || 0}
+                    {title === "Last Week AI Builders" ? (
+                      // Only show "Received" for Last Week AI Builders (Seed Creators)
+                      <div className="flex gap-2 w-full mt-auto">
+                        <div className="flex-1 bg-green-50 rounded-lg p-2 text-center">
+                          <div className="text-lg font-bold text-green-600">
+                            {creator.CommentsReceived || 0}
+                          </div>
+                          <div className="text-xs text-green-600">
+                            Comments Received from Seed Creators
+                          </div>
                         </div>
-                        <div className="text-xs text-blue-600">Made</div>
                       </div>
-                      <div className="flex-1 bg-green-50 rounded-lg p-2 text-center">
-                        <div className="text-lg font-bold text-green-600">
-                          {creator.CommentsReceived || 0}
+                    ) : (
+                      // Original view for other pages
+                      <div className="flex gap-2 w-full mt-auto">
+                        <div className="flex-1 bg-blue-50 rounded-lg p-2 text-center">
+                          <div className="text-lg font-bold text-blue-600">
+                            {creator.CommentsMade || 0}
+                          </div>
+                          <div className="text-xs text-blue-600">Made</div>
                         </div>
-                        <div className="text-xs text-green-600">Received</div>
+                        <div className="flex-1 bg-green-50 rounded-lg p-2 text-center">
+                          <div className="text-lg font-bold text-green-600">
+                            {creator.CommentsReceived || 0}
+                          </div>
+                          <div className="text-xs text-green-600">Received</div>
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </CardContent>
                 </Card>
               ))}
@@ -536,83 +599,78 @@ function NetworkPage({
                   </CardHeader>
                   <CardContent className="pt-0 flex flex-col flex-1">
                     {/* Comment Interactions */}
-                    {(profile.profile_comments &&
-                      profile.profile_comments.length > 0) ||
-                    (profile.profile_commenters &&
-                      profile.profile_commenters.length > 0) ? (
-                      <div className="mb-3">
-                        <div className="grid grid-cols-2 gap-6">
-                          {/* Left Column - Most Comments To */}
-                          <div>
-                            {profile.profile_comments &&
-                            profile.profile_comments.length > 0 ? (
-                              <>
-                                <div className="text-xs font-medium text-gray-700 mb-2">
-                                  Most Comments To:
-                                </div>
-                                <div className="space-y-1">
-                                  {profile.profile_comments.map((comment) => (
-                                    <div
-                                      key={comment.profile_id}
-                                      className="flex items-center gap-1 text-xs"
-                                    >
-                                      <div className="relative">
-                                        {comment.picture_url ? (
-                                          <img
-                                            src={comment.picture_url}
-                                            alt={comment.name}
-                                            className="w-4 h-4 rounded-full object-cover"
-                                            onError={(e) => {
-                                              e.target.style.display = "none"
-                                              e.target.nextSibling.style.display =
-                                                "flex"
-                                            }}
-                                          />
-                                        ) : null}
-                                        <div
-                                          className={`w-4 h-4 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-semibold text-xs ${
-                                            comment.picture_url
-                                              ? "hidden"
-                                              : "flex"
-                                          }`}
-                                        >
-                                          {getInitials(comment.name)}
-                                        </div>
-                                      </div>
-                                      <span className="truncate flex-1 text-xs">
-                                        {comment.name} (
-                                        {comment.commentsFromProfile})
-                                      </span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </>
-                            ) : (
-                              <div className="text-xs text-gray-400">
-                                No comments made
-                              </div>
-                            )}
+                    {title === "Last Week AI Builders" ? (
+                      // Simplified view for Last Week AI Builders - only show "Most Comments To"
+                      profile.profile_comments && profile.profile_comments.length > 0 ? (
+                        <div className="mb-3">
+                          <div className="text-xs font-medium text-gray-700 mb-2">
+                            Most Comments To:
                           </div>
-                          {/* Right Column - Most Comments From */}
-                          <div>
-                            {profile.profile_commenters &&
-                            profile.profile_commenters.length > 0 ? (
-                              <>
-                                <div className="text-xs font-medium text-gray-700 mb-2">
-                                  Most Comments From:
+                          <div className="space-y-1">
+                            {profile.profile_comments.map((comment) => (
+                              <div
+                                key={comment.profile_id}
+                                className="flex items-center gap-1 text-xs"
+                              >
+                                <div className="relative">
+                                  {comment.picture_url ? (
+                                    <img
+                                      src={comment.picture_url}
+                                      alt={comment.name}
+                                      className="w-4 h-4 rounded-full object-cover"
+                                      onError={(e) => {
+                                        e.target.style.display = "none"
+                                        e.target.nextSibling.style.display =
+                                          "flex"
+                                      }}
+                                    />
+                                  ) : null}
+                                  <div
+                                    className={`w-4 h-4 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-semibold text-xs ${
+                                      comment.picture_url
+                                        ? "hidden"
+                                        : "flex"
+                                    }`}
+                                  >
+                                    {getInitials(comment.name)}
+                                  </div>
                                 </div>
-                                <div className="space-y-1">
-                                  {profile.profile_commenters.map(
-                                    (commenter) => (
+                                <span className="truncate flex-1 text-xs">
+                                  {comment.name} (
+                                  {comment.commentsFromProfile})
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ) : null
+                    ) : (
+                      // Original view for other pages
+                      (profile.profile_comments &&
+                        profile.profile_comments.length > 0) ||
+                      (profile.profile_commenters &&
+                        profile.profile_commenters.length > 0) ? (
+                        <div className="mb-3">
+                          <div className="grid grid-cols-2 gap-6">
+                            {/* Left Column - Most Comments To */}
+                            <div>
+                              {profile.profile_comments &&
+                              profile.profile_comments.length > 0 ? (
+                                <>
+                                  <div className="text-xs font-medium text-gray-700 mb-2">
+                                    Most Comments To:
+                                  </div>
+                                  <div className="space-y-1">
+                                    {profile.profile_comments.map((comment) => (
                                       <div
-                                        key={commenter.profile_id}
+                                        key={comment.profile_id}
                                         className="flex items-center gap-1 text-xs"
                                       >
                                         <div className="relative">
-                                          {commenter.picture_url ? (
+                                          {comment.picture_url ? (
                                             <img
-                                              src={commenter.picture_url}
-                                              alt={commenter.name}
+                                              src={comment.picture_url}
+                                              alt={comment.name}
                                               className="w-4 h-4 rounded-full object-cover"
                                               onError={(e) => {
                                                 e.target.style.display = "none"
@@ -623,48 +681,116 @@ function NetworkPage({
                                           ) : null}
                                           <div
                                             className={`w-4 h-4 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-semibold text-xs ${
-                                              commenter.picture_url
+                                              comment.picture_url
                                                 ? "hidden"
                                                 : "flex"
                                             }`}
                                           >
-                                            {getInitials(commenter.name)}
+                                            {getInitials(comment.name)}
                                           </div>
                                         </div>
                                         <span className="truncate flex-1 text-xs">
-                                          {commenter.name} (
-                                          {commenter.commentsToProfile})
+                                          {comment.name} (
+                                          {comment.commentsFromProfile})
                                         </span>
                                       </div>
-                                    )
-                                  )}
+                                    ))}
+                                  </div>
+                                </>
+                              ) : (
+                                <div className="text-xs text-gray-400">
+                                  No comments made
                                 </div>
-                              </>
-                            ) : (
-                              <div className="text-xs text-gray-400">
-                                No comments received
-                              </div>
-                            )}
+                              )}
+                            </div>
+                            {/* Right Column - Most Comments From */}
+                            <div>
+                              {profile.profile_commenters &&
+                              profile.profile_commenters.length > 0 ? (
+                                <>
+                                  <div className="text-xs font-medium text-gray-700 mb-2">
+                                    Most Comments From:
+                                  </div>
+                                  <div className="space-y-1">
+                                    {profile.profile_commenters.map(
+                                      (commenter) => (
+                                        <div
+                                          key={commenter.profile_id}
+                                          className="flex items-center gap-1 text-xs"
+                                        >
+                                          <div className="relative">
+                                            {commenter.picture_url ? (
+                                              <img
+                                                src={commenter.picture_url}
+                                                alt={commenter.name}
+                                                className="w-4 h-4 rounded-full object-cover"
+                                                onError={(e) => {
+                                                  e.target.style.display = "none"
+                                                  e.target.nextSibling.style.display =
+                                                    "flex"
+                                                }}
+                                              />
+                                            ) : null}
+                                            <div
+                                              className={`w-4 h-4 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-semibold text-xs ${
+                                                commenter.picture_url
+                                                  ? "hidden"
+                                                  : "flex"
+                                              }`}
+                                            >
+                                              {getInitials(commenter.name)}
+                                            </div>
+                                          </div>
+                                          <span className="truncate flex-1 text-xs">
+                                            {commenter.name} (
+                                            {commenter.commentsToProfile})
+                                          </span>
+                                        </div>
+                                      )
+                                    )}
+                                  </div>
+                                </>
+                              ) : (
+                                <div className="text-xs text-gray-400">
+                                  No comments received
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ) : null
+                    )}
+
+                    {/* Total Comments Summary */}
+                    {title === "Last Week AI Builders" ? (
+                      // Only show "Received" for Last Week AI Builders
+                      <div className="flex gap-2 w-full mb-3 mt-auto">
+                        <div className="flex-1 bg-green-50 rounded-lg p-2 text-center">
+                          <div className="text-lg font-bold text-green-600">
+                            {profile.commentsTo || 0}
+                          </div>
+                          <div className="text-xs text-green-600">
+                            Comments Sent to Seed Creators
                           </div>
                         </div>
                       </div>
-                    ) : null}
-
-                    {/* Total Comments Summary */}
-                    <div className="flex gap-2 w-full mb-3 mt-auto">
-                      <div className="flex-1 bg-blue-50 rounded-lg p-2 text-center">
-                        <div className="text-lg font-bold text-blue-600">
-                          {profile.commentsFrom || 0}
+                    ) : (
+                      // Original view for other pages
+                      <div className="flex gap-2 w-full mb-3 mt-auto">
+                        <div className="flex-1 bg-blue-50 rounded-lg p-2 text-center">
+                          <div className="text-lg font-bold text-blue-600">
+                            {profile.commentsFrom || 0}
+                          </div>
+                          <div className="text-xs text-blue-600">Made</div>
                         </div>
-                        <div className="text-xs text-blue-600">Made</div>
-                      </div>
-                      <div className="flex-1 bg-green-50 rounded-lg p-2 text-center">
-                        <div className="text-lg font-bold text-green-600">
-                          {profile.commentsTo || 0}
+                        <div className="flex-1 bg-green-50 rounded-lg p-2 text-center">
+                          <div className="text-lg font-bold text-green-600">
+                            {profile.commentsTo || 0}
+                          </div>
+                          <div className="text-xs text-green-600">Received</div>
                         </div>
-                        <div className="text-xs text-green-600">Received</div>
                       </div>
-                    </div>
+                    )}
                   </CardContent>
                 </Card>
               ))}
